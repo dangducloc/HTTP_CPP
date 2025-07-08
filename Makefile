@@ -4,12 +4,13 @@ CXXFLAGS = -std=c++17 -Wall -I./utils
 
 # Sources
 SRC = demo.cpp \
-      utils/read_env.cpp \
-      utils/read_file.cpp \
-      utils/request.class.cpp \
-      utils/server.class.cpp \
-      utils/init_get.cpp\
-      utils/extra.cpp \
+      utils/extra/read_env.cpp \
+      utils/extra/read_file.cpp \
+      utils/model/request.class.cpp \
+      utils/model/server.class.cpp \
+      utils/model/init_get.cpp\
+      utils/model/init_post.cpp\
+      utils/extra/extra.cpp \
 
 # Output
 TARGET = demo.exe

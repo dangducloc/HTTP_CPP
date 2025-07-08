@@ -1,4 +1,4 @@
-#include "./utils/index.h"
+#include "./utils/utils.h"
 #include <iostream>
 #include <string>
 using namespace std;
@@ -26,7 +26,13 @@ int main()
         { 
             return redirect("/", 302); 
         });
-        
+
+        handler.post("/echo", [](const string &body)
+        {
+            string json = "{\"echo\": \"linh\"}";
+            return send_json(json, 200); 
+        });
+
         server srv;
         srv.run(handler);
     }

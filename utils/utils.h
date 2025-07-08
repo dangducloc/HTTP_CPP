@@ -13,10 +13,11 @@ std::string readFile(const std::string &filePath);
 std::string redirect(const std::string &toPath, int code);
 std::string get_ContentType(const std::string &path);
 std::string get_Status(int code);
-std::string send_json(std::string &jsonContent, int code );
+std::string send_json(std::string jsonContent, int code );
 // Routing support
 using RouteHandler = std::function<std::string(const std::string &query)>;
 extern std::unordered_map<std::string, RouteHandler> GET_ROUTES;
+extern std::unordered_map<std::string, RouteHandler> POST_ROUTES;
 
 
 class request_handler
@@ -29,6 +30,8 @@ public:
     std::string handleRequest(const std::string &request);
     std::string handleGET(const std::string &path);
     void get(const std::string &path, RouteHandler handler);
+    std::string handlePOST(const std::string &path, const std::string &body);
+    void post(const std::string &path, RouteHandler handler);
 };
 
 class server

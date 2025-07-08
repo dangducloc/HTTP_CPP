@@ -31,7 +31,7 @@ std::string handleRequest(const std::string& request) {
         return "HTTP/1.1 405 Method Not Allowed\r\n\r\n";
     }
 
-    std::string filePath = WEB_ROOT + (path == "/" ? "/index.html" : path);
+    std::string filePath = WEB_ROOT + (path == "/" ? "/utils.html" : path);
     std::string content = readFile(filePath);
 
     if (content.empty()) {

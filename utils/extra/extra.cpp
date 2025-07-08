@@ -1,4 +1,4 @@
-#include "index.h"
+#include "../utils.h"
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -15,16 +15,18 @@ string redirect(const string &toPath, int code) {
 
     stringstream res;
     res << "HTTP/1.1 " << status << "\r\n";
+    res << "server: CPP server\r\n";
     res << "Location: " << toPath << "\r\n";
     res << "Content-Type: text/plain\r\n\r\n";
     res << "Redirecting to " << toPath;
     return res.str();
 }
 
-string send_json(string &jsonContent, int code ) {
+string send_json(string jsonContent, int code ) {
     string status = get_Status(code);
     stringstream res;
     res << "HTTP/1.1 " << status << "\r\n";
+    res << "server: CPP server\r\n";
     res << "Content-Type: application/json\r\n";
     res << "Content-Length: " << jsonContent.size() << "\r\n";
     res << "Connection: close\r\n\r\n";

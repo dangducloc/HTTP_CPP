@@ -1,17 +1,20 @@
-#include "index.h"
+#include "../utils.h"
 #include <iostream>
 #include <sstream>
 
 using namespace std;
 
-std::unordered_map<std::string, RouteHandler> GET_ROUTES;
-void request_handler::get(const std::string& path, RouteHandler handler) {
+unordered_map<string, RouteHandler> GET_ROUTES;
+void request_handler::get(const string &path, RouteHandler handler)
+{
     GET_ROUTES[path] = handler;
 }
 
-string get_Param(const string& query, const string& key) {
+string get_Param(const string &query, const string &key)
+{
     size_t start = query.find(key + "=");
-    if (start == string::npos) return "";
+    if (start == string::npos)
+        return "";
     start += key.length() + 1;
     size_t end = query.find('&', start);
     return query.substr(start, (end == string::npos ? query.length() : end) - start);
@@ -23,7 +26,7 @@ string request_handler::handleGET(const string &rawPath)
     string path = (qmark != string::npos) ? rawPath.substr(0, qmark) : rawPath;
     string query = (qmark != string::npos) ? rawPath.substr(qmark + 1) : "";
 
-    string filePath = WEB_ROOT + (path == "/" ? "/index.html" : path);
+    string filePath = WEB_ROOT + (path == "/" ? "/utils.html" : path);
     string content = readFile(filePath);
 
     auto it = GET_ROUTES.find(path);
