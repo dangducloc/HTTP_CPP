@@ -21,20 +21,19 @@ string request_handler::handleRequest(const string &request)
     string method, path, protocol;
     requestStream >> method >> path >> protocol;
 
-    string json_body;
-    cout<< "[DEBUG] Request: " << request << endl;
-    
+    // cout << "[DEBUG] Request: " << request << endl;
+
+    string body = extract_body(request);
 
     string debug_line = "[DEBUG] Method: " + method + " | Path: " + path;
-    // if (method == "POST") {
-    //     debug_line += " | Body: "+json_body+ " | Body Length: " + to_string(body.length());
-    // }
 
     string response;
     if (method == "GET") {
         response = handleGET(path);
     } else if (method == "POST") {
-        response = handlePOST(path, json_body);
+        debug_line += " | Body Length: " + to_string(body.length());
+        debug_line += " | Body: " + body.substr(0, 50) + (body.length() > 50 ? "..." : "");
+        response = handlePOST(path, body);
     } else if (method == "PUT" || method == "DELETE") {
         response = send_json("{\"error\": \"Method not allowed\"}", 405);
     } else {
@@ -44,5 +43,6 @@ string request_handler::handleRequest(const string &request)
     string statusLine = response.substr(0, response.find("\r\n"));
     debug_line = debug_line + " | Status: " + statusLine;
     cout << debug_line << endl;
+
     return response;
 }

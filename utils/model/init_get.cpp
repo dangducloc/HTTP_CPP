@@ -26,7 +26,7 @@ string request_handler::handleGET(const string &rawPath)
     string path = (qmark != string::npos) ? rawPath.substr(0, qmark) : rawPath;
     string query = (qmark != string::npos) ? rawPath.substr(qmark + 1) : "";
 
-    string filePath = WEB_ROOT + (path == "/" ? "/utils.html" : path);
+    string filePath = WEB_ROOT + (path == "/" ? "/index.html" : path);
     string content = readFile(filePath);
 
     auto it = GET_ROUTES.find(path);
@@ -37,7 +37,7 @@ string request_handler::handleGET(const string &rawPath)
 
     if (content.empty())
     {
-        return "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n<h1>404 Not Found</h1>";
+        return send_json("{\"error\": \"File not found\"}", 404);
     }
 
     stringstream response;

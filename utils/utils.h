@@ -7,13 +7,19 @@
 #include <unordered_map>
 #include <functional>
 
-std::string getENV(const std::string &key);
-std::string get_Param(const std::string &query, const std::string &key);
 std::string readFile(const std::string &filePath);
+std::string getENV(const std::string &key);
+
+std::string get_Param(const std::string &query, const std::string &key);
 std::string redirect(const std::string &toPath, int code);
 std::string get_ContentType(const std::string &path);
 std::string get_Status(int code);
 std::string send_json(std::string jsonContent, int code );
+
+std::string extract_body(const std::string &request);
+std::string url_decode(const std::string &value);
+std::string xwww_to_json(const std::string &body);
+
 // Routing support
 using RouteHandler = std::function<std::string(const std::string &query)>;
 extern std::unordered_map<std::string, RouteHandler> GET_ROUTES;

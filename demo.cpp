@@ -28,8 +28,9 @@ int main()
         });
 
         handler.post("/echo", [](const string &body)
+        //handle x www
         {
-            string json = "{\"echo\": \"linh\"}";
+            string json = xwww_to_json(body);
             return send_json(json, 200); 
         });
 

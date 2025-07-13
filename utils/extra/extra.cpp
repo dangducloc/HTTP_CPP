@@ -100,3 +100,31 @@ string get_Status(int code)
         return to_string(code) + " Unknown Status";
     }
 }
+
+// Utility to extract body from full HTTP request
+string extract_body(const string &request) {
+    size_t pos = request.find("\r\n\r\n");
+    if (pos != string::npos) {
+        return request.substr(pos + 4); // Skip \r\n\r\n
+    }
+    return "";
+}
+
+string url_decode(const string &value) {
+    string result;
+    for (size_t i = 0; i < value.length(); ++i) {
+        if (value[i] == '%') {
+            if (i + 2 < value.length()) {
+                string hex = value.substr(i + 1, 2);
+                char ch = static_cast<char>(strtol(hex.c_str(), nullptr, 16));
+                result += ch;
+                i += 2;
+            }
+        } else if (value[i] == '+') {
+            result += ' ';
+        } else {
+            result += value[i];
+        }
+    }
+    return result;
+}
