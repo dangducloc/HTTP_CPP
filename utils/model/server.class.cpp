@@ -4,7 +4,6 @@
 #include <ws2tcpip.h>
 #include <stdexcept>
 
-#pragma comment(lib, "ws2_32.lib") 
 
 using namespace std;
 

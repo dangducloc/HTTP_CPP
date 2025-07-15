@@ -1,7 +1,11 @@
 #include "./utils/utils.h"
+#include "./lib/json.hpp"
 #include <iostream>
 #include <string>
+
+using json = nlohmann::json;
 using namespace std;
+
 int main()
 {
     try
@@ -30,8 +34,17 @@ int main()
         handler.post("/echo", [](const string &body)
         //handle x www
         {
-            string json = xwww_to_json(body);
-            return send_json(json, 200); 
+            json json_body = json::parse(xwww_to_json(body));
+            if(json_body.contains("name"))
+            {
+                string name = json_body["name"];
+                json response_json = {{"echo", name}};
+                return send_json(response_json.dump(), 200);
+            }
+            else
+            {
+                return send_json("{\"error\": \"Missing 'name' parameter\"}", 400);
+            }
         });
 
         server srv;

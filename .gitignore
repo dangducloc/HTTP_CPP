@@ -1,5 +1,4 @@
 /.vscode
 /demo.exe
 /highdeal.png
-utils/test/demo1.cpp
-utils/test/demo1.exe
+utils/test/*

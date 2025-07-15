@@ -8,9 +8,9 @@ SRC = demo.cpp \
       utils/extra/read_file.cpp \
       utils/model/request.class.cpp \
       utils/model/server.class.cpp \
-      utils/model/init_get.cpp\
-      utils/model/init_post.cpp\
-      utils/extra/extra.cpp \
+      utils/model/init_get.cpp \
+      utils/model/init_post.cpp \
+      utils/extra/extra.cpp
 
 # Output
 TARGET = demo.exe
@@ -19,7 +19,7 @@ TARGET = demo.exe
 all: $(TARGET)
 
 $(TARGET): $(SRC)
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) -lws2_32
+	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) -lws2_32 -lstdc++fs
 
 # Clean up (Windows)
 clean:
