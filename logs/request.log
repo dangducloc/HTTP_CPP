@@ -1,0 +1,13 @@
+2025-07-18 17:44:17 - [INFO] Method: GET | Path: / | Status: 200 OK
+2025-07-18 17:45:11 - [INFO] Method: GET | Path: /ls?dir=/etc/adduser.conf | Status: 200 OK
+2025-07-18 17:45:26 - [INFO] Method: GET | Path: / | Status: 200 OK
+2025-07-18 17:46:26 - [INFO] Method: POST | Path: /echo | Body Length: 9 | Body: name=linh | Status: 200 OK
+2025-07-18 17:47:01 - [INFO] Method: POST | Path: /echo | Body Length: 18 | Body: name=linh&linh=sss | Status: 200 OK
+2025-07-18 20:55:24 - [INFO] Method: GET | Path: /ls?dir=/etc/ | Status: 200 OK
+2025-07-21 08:33:23 - [INFO] Method: GET | Path: / | Status: 200 OK
+2025-07-21 08:33:27 - [INFO] Method: GET | Path: /favicon.ico | Status: 404 Not Found
+2025-07-21 08:36:35 - [INFO] Method: GET | Path: /index.html | Status: 200 OK
+2025-07-21 08:37:19 - [INFO] Method: POST | Path: /uploads | Body Length: 0 | Status: 404 Not Found
+2025-07-21 08:50:20 - [INFO] Method: POST | Path: /uploads | Body Length: 0 | Status: 404 Not Found
+2025-07-21 08:55:47 - [INFO] Method: POST | Path: /uploads | Body Length: 116 | Body: ------WebKitFormBoundaryfgrbYfBos8imKTb3
+Content-Disposition: form-data; name="file"; filename="1.t... | Status: 501 Not Implemented

@@ -1,86 +1,61 @@
 #include "../utils.h"
 #include <iostream>
-#include <winsock2.h>
-#include <ws2tcpip.h>
 #include <stdexcept>
-
+#include <cstring>
+#include <unistd.h>
+#include <netinet/in.h>
 
 using namespace std;
 
 server::server() {
-    WSAData wsaData;
-
-    // Initialize Winsock
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-        throw runtime_error("WSAStartup failed: " + to_string(WSAGetLastError()));
-    }
-
-    // Create socket
-    server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (server_fd == INVALID_SOCKET) {
-        WSACleanup();
-        throw runtime_error("Socket creation failed: " + to_string(WSAGetLastError()));
-    }
-
-    // Set socket options
-    int opt = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (char*)&opt, sizeof(opt)) == SOCKET_ERROR) {
-        closesocket(server_fd);
-        WSACleanup();
-        throw runtime_error("Set socket options failed: " + to_string(WSAGetLastError()));
-    }
-
-    // Get PORT
     int PORT = stoi(getENV("PORT"));
 
-    // Bind socket
-    sockaddr_in address;
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        throw runtime_error("Socket creation failed");
+    }
+
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        close(server_fd);
+        throw runtime_error("Set socket options failed");
+    }
+
+    sockaddr_in address{};
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
 
-    if (bind(server_fd, (sockaddr*)&address, sizeof(address)) == SOCKET_ERROR) {
-        closesocket(server_fd);
-        WSACleanup();
-        throw runtime_error("Bind failed: " + to_string(WSAGetLastError()));
+    if (bind(server_fd, (sockaddr*)&address, sizeof(address)) < 0) {
+        close(server_fd);
+        throw runtime_error("Bind failed");
     }
 
-    // Listen
-    if (listen(server_fd, 10) == SOCKET_ERROR) {
-        closesocket(server_fd);
-        WSACleanup();
-        throw runtime_error("Listen failed: " + to_string(WSAGetLastError()));
+    if (listen(server_fd, 10) < 0) {
+        close(server_fd);
+        throw runtime_error("Listen failed");
     }
 
     cout << "[+] Server listening on port " << PORT << endl;
 }
 
-
-void server:: run(request_handler &handler) {
+void server::run(request_handler &handler) {
     while (true) {
-        // Accept client
-        SOCKET client_socket = accept(server_fd, nullptr, nullptr);
-        if (client_socket == INVALID_SOCKET) {
-            cerr << "Accept failed: " << WSAGetLastError() << endl;
+        socket_t client_socket = accept(server_fd, nullptr, nullptr);
+        if (client_socket < 0) {
+            perror("Accept failed");
             continue;
         }
 
-        // Read request
         char buffer[1024];
-        int bytesReceived = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+        ssize_t bytesReceived = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
         if (bytesReceived > 0) {
-            buffer[bytesReceived] = '\0'; // Null-terminate the string
+            buffer[bytesReceived] = '\0';
             string request(buffer);
-
-            // Handle request
             string response = handler.handleRequest(request);
-
-            // Send response
             send(client_socket, response.c_str(), response.length(), 0);
         }
 
-        // Close client socket
-        closesocket(client_socket);
+        close(client_socket);
     }
-
 }
