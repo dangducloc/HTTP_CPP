@@ -36,13 +36,13 @@ int main()
     {
         request_handler handler;
 
-        handler.get("/", [](const string &query)
+        handler.get("/", [](const string &req)
                     { 
                     string json = "{\"msg\":\"say no to UI - linh\"}";
                     return send_json(json, 200); });
 
-        handler.get("/ls", [](const string &query){
-            string dir = get_Param(query, "dir");
+        handler.get("/ls", [](const string &req){
+            string dir = get_Param(req, "dir");
             if (dir.empty()) dir = "/";
 
             // Basic injection prevention
@@ -76,12 +76,13 @@ int main()
 
             return send_json(result.dump(), 200); });
 
-        handler.get("/test_redirect", [](const string &query)
+        handler.get("/test_redirect", [](const string &req)
                     { return redirect("/", 302); });
 
-        handler.post("/echo", [](const string &body)
+        handler.post("/echo", [](const string &req)
                      // handle x www
             {
+            string body = extract_body(req);
             json json_body = json::parse(xwww_to_json(body));
             if(json_body.contains("name"))
             {
@@ -93,9 +94,10 @@ int main()
             {
                 return send_json("{\"error\": \"Missing 'name' parameter\"}", 400);
             } });
-        handler.post("/uploads",[](const string &body){
-            json res = {{"msg", "File upload not implemented yet"}};
-            return send_json(res.dump(), 501);
+        handler.post("/uploads",[](const string &req){
+            json result = handle_file_upload(req,getENV("WEB_ROOT")+"/uploads","file");
+            int status = result.contains("error") ? 400 : 200;
+            return send_json(result.dump(), status);
         });
         server srv;
         srv.run(handler);

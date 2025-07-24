@@ -6,6 +6,8 @@ CXXFLAGS = -std=c++17 -Wall -I./utils
 SRC = demo.cpp \
       utils/extra/read_env.cpp \
       utils/extra/read_file.cpp \
+      utils/extra/form_data.cpp \
+      utils/extra/file_upload.cpp \
       utils/model/request.class.cpp \
       utils/model/logger.class.cpp \
       utils/model/server.class.cpp \

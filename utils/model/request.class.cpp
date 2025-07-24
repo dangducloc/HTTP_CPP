@@ -5,14 +5,17 @@
 
 using namespace std;
 
-request_handler::request_handler() {
+request_handler::request_handler()
+{
     WEB_ROOT = getENV("WEB_ROOT");
-    if (WEB_ROOT.empty()) {
+    if (WEB_ROOT.empty())
+    {
         WEB_ROOT = "./www"; // Default web root
     }
 }
 
-string request_handler::handleRequest(const string &request) {
+string request_handler::handleRequest(const string &request)
+{
     Logger logger;
     stringstream requestStream(request);
     string method, path, protocol;
@@ -24,25 +27,41 @@ string request_handler::handleRequest(const string &request) {
 
     string response;
 
-    if (method == "GET") {
-        response = handleGET(path);
-    } else if (method == "POST") {
-        debug << " | Body Length: " << body.length();
-        if (!body.empty()) {
-            debug << " | Body: " << (body.length() > 100 ? body.substr(0, 100) + "..." : body);
+    if (method == "GET")
+    {
+        response = handleGET(request);
+    }
+    else if (method == "POST")
+    {
+        string content_type = get_header_value(request, "Content-Type");
+        string boundary;
+        if (!content_type.empty() && content_type.find("multipart/form-data") != string::npos)
+        {
+            boundary = extract_boundary(content_type);
+            debug << " | Boundary: " << boundary;
         }
-        response = handlePOST(path, body);
-    } else if (method == "PUT" || method == "DELETE") {
+
+        debug << " | Body Length: " << body.length();
+        if (!body.empty())
+        {
+            debug << " | Body: " << (body.length() > 100 ? body : body);
+        }
+
+        response = handlePOST(request);
+    }
+    else if (method == "PUT" || method == "DELETE")
+    {
         response = send_json("{\"error\": \"Method not allowed\"}", 405);
-    } else {
+    }
+    else
+    {
         response = send_json("{\"error\": \"Unsupported method\"}", 501);
     }
 
-    
+    // Extract HTTP status code from response
     size_t status_start = response.find(' ');
     size_t status_end = response.find("\r\n");
-    string status = (status_start != string::npos && status_end != string::npos) ?
-                    response.substr(status_start + 1, status_end - status_start - 1) : "Unknown";
+    string status = (status_start != string::npos && status_end != string::npos) ? response.substr(status_start + 1, status_end - status_start - 1) : "Unknown";
 
     debug << " | Status: " << status;
     cout << debug.str() << endl;

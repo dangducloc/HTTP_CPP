@@ -2,5 +2,8 @@
 /demo.exe
 /highdeal.png
 utils/test/*
-1.txt
+*.txt
 server
+demo.jpeg
+logs/request.log
+logs/request.log
