@@ -7,7 +7,7 @@
 using json = nlohmann::json;
 using namespace std;
 
-json handle_file_upload(const string &request, const string &upload_dir, const string &required_field) {
+json request_handler::handle_file_upload(const string &request, const string &upload_dir, const string &required_field) {
     string content_type = get_header_value(request, "Content-Type");
     string boundary = extract_boundary(content_type);
 

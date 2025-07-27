@@ -37,12 +37,14 @@ int main()
         request_handler handler;
 
         handler.get("/", [](const string &req)
-                    { 
-                    string json = "{\"msg\":\"say no to UI - linh\"}";
-                    return send_json(json, 200); });
+                { 
+                // thread test
+                this_thread::sleep_for(chrono::seconds(3));
+                string json = "{\"msg\":\"say no to UI - linh\"}";
+                return send_json(json, 200); });
 
-        handler.get("/ls", [](const string &req){
-            string dir = get_Param(req, "dir");
+        handler.get("/ls", [&](const string &req){
+            string dir = handler.get_Param(req, "dir");
             if (dir.empty()) dir = "/";
 
             // Basic injection prevention
@@ -79,26 +81,29 @@ int main()
         handler.get("/test_redirect", [](const string &req)
                     { return redirect("/", 302); });
 
-        handler.post("/echo", [](const string &req)
-                     // handle x www
+        handler.post("/echo", [&](const string &req)
             {
-            string body = extract_body(req);
-            json json_body = json::parse(xwww_to_json(body));
-            if(json_body.contains("name"))
+                json body = handler.body(req);
+                if (body.empty())
+                {
+                    return send_json("{\"error\": \"Empty body\"}", 400);
+                }
+                if(!body.contains("msg"))
+                {
+                    return send_json("{\"error\": \"Missing 'msg' field\"}", 400);
+                }
+                json response = {
+                    {"msg", body["msg"]},
+                    {"status", "success"}
+                };
+                return send_json(response.dump(), 200);
+            });
+        handler.post("/uploads",[&](const string &req)
             {
-                string name = json_body["name"];
-                json response_json = {{"echo", name}};
-                return send_json(response_json.dump(), 200);
-            }
-            else
-            {
-                return send_json("{\"error\": \"Missing 'name' parameter\"}", 400);
-            } });
-        handler.post("/uploads",[](const string &req){
-            json result = handle_file_upload(req,getENV("WEB_ROOT")+"/uploads","file");
-            int status = result.contains("error") ? 400 : 200;
-            return send_json(result.dump(), status);
-        });
+                json result = handler.handle_file_upload(req,getENV("WEB_ROOT")+"/uploads","file");
+                int status = result.contains("error") ? 400 : 200;
+                return send_json(result.dump(), status);
+            });
         server srv;
         srv.run(handler);
     }

@@ -7,12 +7,13 @@ SRC = main.cpp \
       utils/extra/read_env.cpp \
       utils/extra/read_file.cpp \
       utils/extra/form_data.cpp \
-      utils/extra/file_upload.cpp \
       utils/model/request.class.cpp \
       utils/model/logger.class.cpp \
       utils/model/server.class.cpp \
-      utils/model/init_get.cpp \
-      utils/model/init_post.cpp \
+      utils/model/req.init_get.cpp \
+      utils/model/req.init_post.cpp \
+      utils/model/req.body.cpp \
+      utils/model/req.file_upload.cpp \
       utils/extra/extra.cpp
 
 # Output

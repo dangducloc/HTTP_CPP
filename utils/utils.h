@@ -22,9 +22,8 @@ std::string getENV(const std::string &key);
 
 std::string trim(const std::string &str);
 
-
-std::string get_Param(const std::string &query, const std::string &key);
 std::string redirect(const std::string &toPath, int code);
+
 std::string get_ContentType(const std::string &path);
 std::string get_Status(int code);
 std::string send_json(std::string jsonContent, int code);
@@ -51,12 +50,19 @@ class request_handler
 {
 public:
     std::string WEB_ROOT;
+
     request_handler();
     std::string handleRequest(const std::string &request);
+
     std::string handleGET(const std::string &path);
     void get(const std::string &path, RouteHandler handler);
     std::string handlePOST(const std::string &body);
     void post(const std::string &path, RouteHandler handler);
+
+    std::string get_Param(const std::string &query, const std::string &key);
+
+    json body(const std::string &request);
+    json handle_file_upload(const std::string &request, const std::string &upload_dir, const std::string &required_field);
 };
 
 // Server class
@@ -81,13 +87,10 @@ public:
     Logger();
     void log(const std::string &message, const std::string &filename);
     std::string getLogDir() const;
-
-
 };
 std::string get_header_value(const std::string& request, const std::string& header_name);
 std::string extract_boundary(const std::string& content_type);
 std::vector<FormPart> parse_multipart(const std::string& body, const std::string& boundary);
-json handle_file_upload(const std::string &request, const std::string &upload_dir, const std::string &required_field);
 
 
 #endif // utils

@@ -6,3 +6,4 @@ utils/test/*
 server
 demo.jpeg
 logs/request.log
+*.py

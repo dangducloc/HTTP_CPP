@@ -10,7 +10,7 @@ void request_handler::get(const string &path, RouteHandler handler)
     GET_ROUTES[path] = handler;
 }
 
-string get_Param(const string &query, const string &key)
+string request_handler::get_Param(const string &query, const string &key)
 {
     size_t start = query.find(key + "=");
     if (start == string::npos)
