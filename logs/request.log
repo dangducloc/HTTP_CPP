@@ -614,3 +614,16 @@ Lorem ipsum dolor sit amet consectetur adipiscing elit. Quisque faucibus ex sapi
 2025-07-27 08:18:13 - [INFO] Method: GET | Path: /index.html | Status: 200 OK
 2025-07-27 08:18:16 - [INFO] Method: GET | Path: /favicon.ico | Status: 404 Not Found
 2025-07-27 08:18:29 - [INFO] Method: GET | Path: /uploads/lorem1.txt | Status: 200 OK
+2025-07-27 08:44:12 - [INFO] Method: POST | Path: /uploads | Boundary: ------------------------EsxkSWYCGU7WO3ZuFr2rAC | Body Length: 549 | Body: --------------------------EsxkSWYCGU7WO3ZuFr2rAC
+Content-Disposition: form-data; name="file"; filename="1.txt"
+Content-Type: text/plain
+
+aaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcj
+aaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcjaaadjaljflsdajflsdhfbsdsdcksdbcj
+--------------------------EsxkSWYCGU7WO3ZuFr2rAC--
+ | Status: 200 OK
+2025-07-27 08:57:59 - [INFO] Method: POST | Path: /uploads | Boundary: ------------------------gWd4J10UwnnQzhSh0bJKfn | Body Length: 149 | Body: --------------------------gWd4J10UwnnQzhSh0bJKfn
+Content-Disposition: form-data; name="file"; filename="demo.jpeg"
+Content-Type: image/jpeg
+
+ÿØÿà | Status: 400 Bad Request

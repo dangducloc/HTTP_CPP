@@ -3,7 +3,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall -I./utils
 
 # Sources
-SRC = demo.cpp \
+SRC = main.cpp \
       utils/extra/read_env.cpp \
       utils/extra/read_file.cpp \
       utils/extra/form_data.cpp \
