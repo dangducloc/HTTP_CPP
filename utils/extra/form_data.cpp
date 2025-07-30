@@ -16,12 +16,15 @@ string get_header_value(const string& request, const string& header_name) {
     string line;
     string prefix = header_name + ": ";
 
-    while (getline(stream, line) && line != "\r") {
+    while (getline(stream, line)) {
+        if (line == "\r" || line.empty()) break;
+
+        // Xóa \r cuối dòng nếu có
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+
         if (line.find(prefix) == 0) {
-            // Remove trailing \r if present
-            if (!line.empty() && line.back() == '\r') {
-                line.pop_back();
-            }
             return line.substr(prefix.length());
         }
     }

@@ -22,15 +22,15 @@ string redirect(const string &toPath, int code) {
     return res.str();
 }
 
-string send_json(string jsonContent, int code ) {
+string response(string content, int code ) {
     string status = get_Status(code);
     stringstream res;
     res << "HTTP/1.1 " << status << "\r\n";
     res << "server: "<<getENV("SERVER_NAME")<<"\r\n";
     res << "Content-Type: application/json\r\n";
-    res << "Content-Length: " << jsonContent.size() << "\r\n";
+    res << "Content-Length: " << content.size() << "\r\n";
     res << "Connection: close\r\n\r\n";
-    res << jsonContent;
+    res << content;
     return res.str();
 }
 

@@ -25,11 +25,10 @@ string request_handler::handleRequest(const string &request)
     stringstream debug;
     debug << "[INFO] Method: " << method << " | Path: " << path;
 
-    string response;
-
+    string res;
     if (method == "GET")
     {
-        response = handleGET(request);
+        res = handleGET(request);
     }
     else if (method == "POST")
     {
@@ -47,25 +46,25 @@ string request_handler::handleRequest(const string &request)
             debug << " | Body: " << (body.length() > 100 ? body : body);
         }
 
-        response = handlePOST(request);
+        res = handlePOST(request);
     }
     else if (method == "PUT" || method == "DELETE")
     {
-        response = send_json("{\"error\": \"Method not allowed\"}", 405);
+        res = response("{\"error\": \"Method not allowed\"}", 405);
     }
     else
     {
-        response = send_json("{\"error\": \"Unsupported method\"}", 501);
+        res = response("{\"error\": \"Unsupported method\"}", 501);
     }
 
     // Extract HTTP status code from response
-    size_t status_start = response.find(' ');
-    size_t status_end = response.find("\r\n");
-    string status = (status_start != string::npos && status_end != string::npos) ? response.substr(status_start + 1, status_end - status_start - 1) : "Unknown";
+    size_t status_start = res.find(' ');
+    size_t status_end = res.find("\r\n");
+    string status = (status_start != string::npos && status_end != string::npos) ? res.substr(status_start + 1, status_end - status_start - 1) : "Unknown";
 
     debug << " | Status: " << status;
     cout << debug.str() << endl;
     logger.log(debug.str(), "request.log");
 
-    return response;
+    return res;
 }

@@ -32,7 +32,7 @@ string request_handler::handleGET(const string &req)
 
     auto it = GET_ROUTES.find(path);
     if (it != GET_ROUTES.end()) {
-        string response = it->second(query);
+        string response = it->second(req);
         return response;
     }
 
@@ -40,7 +40,7 @@ string request_handler::handleGET(const string &req)
     string content = readFile(filePath);
 
     if (content.empty()) {
-        string error = send_json("{\"error\": \"Not found\"}", 404);
+        string error = response("{\"error\": \"Not found\"}", 404);
         return error;
     }
 

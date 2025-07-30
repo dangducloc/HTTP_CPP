@@ -10,10 +10,12 @@ SRC = main.cpp \
       utils/model/request.class.cpp \
       utils/model/logger.class.cpp \
       utils/model/server.class.cpp \
+      utils/model/cookie.class.cpp \
       utils/model/req.init_get.cpp \
       utils/model/req.init_post.cpp \
       utils/model/req.body.cpp \
       utils/model/req.file_upload.cpp \
+      utils/model/req.cookie.cpp \
       utils/extra/extra.cpp
 
 # Output

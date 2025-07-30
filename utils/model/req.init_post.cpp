@@ -82,6 +82,6 @@ string request_handler::handlePOST(const string &req) {
     if (it != POST_ROUTES.end()) {
         return it->second(req);
     } else {
-        return send_json("{\"error\": \"Route not found\"}", 404);
+        return response("{\"error\": \"Route not found\"}", 404);
     }
 }

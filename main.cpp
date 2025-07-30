@@ -37,11 +37,11 @@ int main()
         request_handler handler;
 
         handler.get("/", [](const string &req)
-                { 
-                // thread test
-                this_thread::sleep_for(chrono::seconds(3));
-                string json = "{\"msg\":\"say no to UI - linh\"}";
-                return send_json(json, 200); });
+            { 
+            // thread test
+            this_thread::sleep_for(chrono::seconds(3));
+            string json = "{\"msg\":\"say no to UI - linh\"}";
+            return response(json, 200); });
 
         handler.get("/ls", [&](const string &req){
             string dir = handler.get_Param(req, "dir");
@@ -50,7 +50,7 @@ int main()
             // Basic injection prevention
             if (dir.find(';') != string::npos || dir.find('&') != string::npos) {
                 json err = {{"error", "Invalid path"}};
-                return send_json(err.dump(), 400);
+                return response(err.dump(), 400);
             }
 
             string command = "ls \"" + dir + "\"";
@@ -60,7 +60,7 @@ int main()
                 output = exec_command(command);
             } catch (const exception& e) {
                 json err = {{"error", e.what()}};
-                return send_json(err.dump(), 500);
+                return response(err.dump(), 500);
             }
 
             istringstream ss(output);
@@ -76,7 +76,7 @@ int main()
             }
             json result = {{"result", arr}};
 
-            return send_json(result.dump(), 200); });
+            return response(result.dump(), 200); });
 
         handler.get("/test_redirect", [](const string &req)
                     { return redirect("/", 302); });
@@ -86,24 +86,44 @@ int main()
                 json body = handler.body(req);
                 if (body.empty())
                 {
-                    return send_json("{\"error\": \"Empty body\"}", 400);
+                    return response("{\"error\": \"Empty body\"}", 400);
                 }
                 if(!body.contains("msg"))
                 {
-                    return send_json("{\"error\": \"Missing 'msg' field\"}", 400);
+                    return response("{\"error\": \"Missing 'msg' field\"}", 400);
                 }
-                json response = {
+                json res = {
                     {"msg", body["msg"]},
                     {"status", "success"}
                 };
-                return send_json(response.dump(), 200);
+                return response(res.dump(), 200);
             });
         handler.post("/uploads",[&](const string &req)
             {
                 json result = handler.handle_file_upload(req,getENV("WEB_ROOT")+"/uploads","file");
                 int status = result.contains("error") ? 400 : 200;
-                return send_json(result.dump(), status);
+                return response(result.dump(), status);
             });
+        handler.get("/cookie", [&](const string &req)
+            {
+                Cookie cookie("test","oke",3600, "/", "", false, true);
+                json demo = {{"test","oke"}};
+                string res = response(demo.dump(), 200);
+                res = handler.set_cookie(res, cookie);
+                return res;
+                
+            });
+        handler.get("/cookie/get", [&](const string &req)
+            {
+                string cookie_value = handler.get_cookie(req, "test");
+                if (cookie_value.empty())
+                {
+                    return response("{\"error\": \"Cookie not found\"}", 404);
+                }
+                json res = {{"cookie", cookie_value}};
+                return response(res.dump(), 200);
+            });
+        
         server srv;
         srv.run(handler);
     }
