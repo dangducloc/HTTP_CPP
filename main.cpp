@@ -123,6 +123,11 @@ int main()
                 json res = {{"cookie", cookie_value}};
                 return response(res.dump(), 200);
             });
+        handler.post("/image", [&](const string &req)
+            {
+                return response(handler.body(req).dump(), 200,"text/plain");
+            });
+        
         
         server srv;
         srv.run(handler);

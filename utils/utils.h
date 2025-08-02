@@ -26,7 +26,7 @@ std::string redirect(const std::string &toPath, int code);
 
 std::string get_ContentType(const std::string &path);
 std::string get_Status(int code);
-std::string response(std::string content, int code);
+std::string response(std::string content, int code, const std::string &contentType = "application/json");
 
 std::string extract_body(const std::string &request);
 std::string url_decode(const std::string &value);
