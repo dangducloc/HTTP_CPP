@@ -1,4 +1,3 @@
-// yo wtf
 #include "../utils.h"
 #include <string>
 #include <unordered_map>
@@ -7,8 +6,6 @@
 #include <vector>
 
 using namespace std;
-
-
 
 // Helper: Get value of specific header
 string get_header_value(const string& request, const string& header_name) {
@@ -19,7 +16,6 @@ string get_header_value(const string& request, const string& header_name) {
     while (getline(stream, line)) {
         if (line == "\r" || line.empty()) break;
 
-        // Xóa \r cuối dòng nếu có
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
@@ -47,7 +43,6 @@ string extract_boundary(const string& content_type) {
     return boundary;
 }
 
-
 // Parse multipart/form-data
 vector<FormPart> parse_multipart(const string& body, const string& boundary) {
     vector<FormPart> parts;
@@ -58,8 +53,13 @@ vector<FormPart> parse_multipart(const string& body, const string& boundary) {
 
     while ((next = body.find(delimiter, pos)) != string::npos) {
         size_t part_start = next + delimiter.length();
-        size_t part_end = body.find(delimiter, part_start);
 
+        // Skip leading \r\n
+        if (body.substr(part_start, 2) == "\r\n") {
+            part_start += 2;
+        }
+
+        size_t part_end = body.find(delimiter, part_start);
         if (part_end == string::npos) break;
 
         string part = body.substr(part_start, part_end - part_start);
@@ -70,13 +70,15 @@ vector<FormPart> parse_multipart(const string& body, const string& boundary) {
         if (header_end == string::npos) continue;
 
         string headers = part.substr(0, header_end);
-        string content = trim(part.substr(header_end + 4));
+        string content = part.substr(header_end + 4);  // keep raw data
 
         FormPart fp;
 
         istringstream header_stream(headers);
         string line;
         while (getline(header_stream, line)) {
+            if (!line.empty() && line.back() == '\r') line.pop_back();
+
             if (line.find("Content-Disposition:") != string::npos) {
                 size_t name_pos = line.find("name=\"");
                 if (name_pos != string::npos) {
@@ -98,7 +100,7 @@ vector<FormPart> parse_multipart(const string& body, const string& boundary) {
             }
         }
 
-        fp.data = content;
+        fp.data = vector<unsigned char>(content.begin(), content.end());
         parts.push_back(fp);
     }
 

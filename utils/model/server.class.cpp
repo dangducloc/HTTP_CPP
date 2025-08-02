@@ -39,15 +39,16 @@ server::server() {
     cout << "[+] Server listening on port " << PORT << endl;
 }
 
-void handle_client(socket_t client_socket, request_handler& handler) {
-    char buffer[4096];
-    ssize_t bytesReceived = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
+void handle_client(socket_t client_socket, request_handler &handler) {
+    vector<char> buffer(8192);
+    ssize_t bytesReceived = recv(client_socket, buffer.data(), buffer.size(), 0);
+
     if (bytesReceived > 0) {
-        buffer[bytesReceived] = '\0';
-        string request(buffer);
-        string response = handler.handleRequest(request);
-        send(client_socket, response.c_str(), response.length(), 0);
+        buffer.resize(bytesReceived);
+        string response = handler.handleRequest(buffer);  // vector<char> version
+        send(client_socket, response.c_str(), response.size(), 0);
     }
+
     close(client_socket);
 }
 

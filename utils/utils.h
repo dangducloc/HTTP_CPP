@@ -44,7 +44,7 @@ struct FormPart {
    std::string name;
    std::string filename;
    std::string content_type;
-   std::string data;
+   std::vector<unsigned char> data
 };
 std::vector<FormPart> parse_multipart(const std::string& body, const std::string& boundary);
 
