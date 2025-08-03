@@ -1,17 +1,19 @@
 #include "../../lib/json.hpp"
 #include "../utils.h"
 #include <string>
+#include <vector>
 #include <iostream>
 
 using namespace std;
 using json = nlohmann::json;
 
-json request_handler::body(const string &req) {
-    string content_type = get_header_value(req, "Content-Type");
-    string body = extract_body(req);
+json request_handler::body(const vector<char> &req) {
+    string request(req.begin(), req.end());
+    string content_type = get_header_value(request, "Content-Type");
+    string body = extract_body(request);
 
     if (content_type.find("application/json") != string::npos) {
-        return json::parse(body);  // direct JSON parsing
+        return json::parse(body);
     }
 
     if (content_type.find("application/x-www-form-urlencoded") != string::npos) {
@@ -28,7 +30,7 @@ json request_handler::body(const string &req) {
         json j;
         for (const auto &part : parts) {
             if (part.filename.empty()) {
-                j[part.name] = part.data;
+                j[part.name] = string(part.data.begin(), part.data.end());
             } else {
                 j[part.name] = {
                     {"filename", part.filename},

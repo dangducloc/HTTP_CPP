@@ -1,13 +1,15 @@
+#include "../utils.h"
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include "../../lib/json.hpp"
-#include "../utils.h"
 
 using json = nlohmann::json;
 using namespace std;
 
-json request_handler::handle_file_upload(const string &request, const string &upload_dir, const string &required_field) {
+json request_handler::handle_file_upload(const vector<char> &req, const string &upload_dir, const string &required_field) {
+    string request(req.begin(), req.end());
     string content_type = get_header_value(request, "Content-Type");
     string boundary = extract_boundary(content_type);
 
@@ -21,25 +23,22 @@ json request_handler::handle_file_upload(const string &request, const string &up
     json uploaded = json::array();
 
     for (const auto &part : parts) {
-        // ✅ Check if the part matches the expected field name
         if (part.name != required_field) {
             continue;  // skip unrelated fields
         }
 
         if (!part.filename.empty()) {
-            // Optionally sanitize filename
             string safe_filename = part.filename;
             for (char &c : safe_filename) {
                 if (c == '/' || c == '\\') c = '_';
             }
 
-            // Save the file
             ofstream out(upload_dir + "/" + safe_filename, ios::binary);
             if (!out) {
                 return {{"error", "Failed to save file: " + safe_filename}};
             }
 
-            out << part.data;
+            out.write(reinterpret_cast<const char *>(part.data.data()), part.data.size());
             out.close();
 
             uploaded.push_back({

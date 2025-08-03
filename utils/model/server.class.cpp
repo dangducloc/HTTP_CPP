@@ -1,5 +1,6 @@
 #include "../utils.h"
 #include <iostream>
+#include <vector>
 #include <stdexcept>
 #include <cstring>
 #include <unistd.h>
@@ -40,13 +41,18 @@ server::server() {
 }
 
 void handle_client(socket_t client_socket, request_handler &handler) {
-    vector<char> buffer(8192);
-    ssize_t bytesReceived = recv(client_socket, buffer.data(), buffer.size(), 0);
+    vector<char> buffer;
+    char temp[8192];
+    ssize_t bytesReceived;
 
-    if (bytesReceived > 0) {
-        buffer.resize(bytesReceived);
-        string response = handler.handleRequest(buffer);  // vector<char> version
-        send(client_socket, response.c_str(), response.size(), 0);
+    while ((bytesReceived = recv(client_socket, temp, sizeof(temp), 0)) > 0) {
+        buffer.insert(buffer.end(), temp, temp + bytesReceived);
+        if (bytesReceived < sizeof(temp)) break;
+    }
+
+    if (!buffer.empty()) {
+        std::vector<char> response = handler.handleRequest(buffer);
+        send(client_socket, response.data(), response.size(), 0);
     }
 
     close(client_socket);

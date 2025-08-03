@@ -9,3 +9,4 @@ logs/*
 *.py
 demo.*
 test/*
+www/uploads/*

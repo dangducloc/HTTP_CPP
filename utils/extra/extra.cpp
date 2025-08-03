@@ -1,5 +1,6 @@
 #include "../utils.h"
 #include <string>
+#include <vector>
 #include <iostream>
 #include <sstream>
 
@@ -22,18 +23,20 @@ string redirect(const string &toPath, int code) {
     return res.str();
 }
 
-string response(string content, int code , const string &contentType) {
-    string status = get_Status(code);
+
+vector<char> response(const string &content, int code, const string &contentType) {
     stringstream res;
-    res << "HTTP/1.1 " << status << "\r\n";
-    res << "server: "<<getENV("SERVER_NAME")<<"\r\n";
-    res << "Content-Type: "<<contentType<<"\r\n";
+
+    res << "HTTP/1.1 " << get_Status(code) << "\r\n";
+    res << "Server: " << getENV("SERVER_NAME") << "\r\n";
+    res << "Content-Type: " << contentType << "\r\n";
     res << "Content-Length: " << content.size() << "\r\n";
     res << "Connection: close\r\n\r\n";
     res << content;
-    return res.str();
-}
 
+    string response_str = res.str();
+    return vector<char>(response_str.begin(), response_str.end());
+}
 bool endsWith(const string &str, const string &suffix)
 {
     return str.size() >= suffix.size() &&
