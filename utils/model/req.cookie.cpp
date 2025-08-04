@@ -5,26 +5,23 @@
 using namespace std;
 
 
-string request_handler::set_cookie(string &response, const Cookie &cookie) {
-    string cookie_header = "Set-Cookie: " + cookie.toString();
 
-    size_t header_end = response.find("\r\n\r\n");
-    if (header_end == string::npos) return response;
-
-    response.insert(header_end, cookie_header + "\r\n");
-
-    return response;
-}
-
-string request_handler::get_cookie(const string &request, const string &name) {
-    string cookie_str = get_header_value(request, "Cookie");
+string request_handler::get_cookie(const vector<char> &request, const string &name) {
+    string req_str(request.begin(), request.end()); 
+    string cookie_str = get_header_value(req_str, "Cookie");
     if (cookie_str.empty()) return "";
 
-    size_t pos = cookie_str.find(name + "=");
-    if (pos == string::npos) return "";
+    istringstream ss(cookie_str);
+    string token;
 
-    pos += name.length() + 1;
-    size_t end = cookie_str.find(';', pos);
+    while (getline(ss, token, ';')) {
+        size_t eq = token.find('=');
+        if (eq != string::npos) {
+            string key = trim(token.substr(0, eq));
+            string val = token.substr(eq + 1);
+            if (key == name) return val;
+        }
+    }
 
-    return cookie_str.substr(pos, end == string::npos ? string::npos : end - pos);
+    return "";
 }

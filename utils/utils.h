@@ -22,14 +22,22 @@ typedef int socket_t;
 std::string readFile(const std::string &filePath);
 std::string getENV(const std::string &key);
 std::string trim(const std::string &str);
-std::string redirect(const std::string &toPath, int code);
+std::vector<char> redirect(const std::string &toPath, int code);
 std::string get_ContentType(const std::string &path);
 std::string get_Status(int code);
-std::vector<char> response(const std::string &content, int code, const std::string &contentType = "application/json");
+std::vector<char> response(
+    const std::string &content,
+    int code,
+    const std::string &contentType = "application/json",
+    const std::vector<std::string> &extra_headers = {}
+);
 std::string extract_body(const std::string &request);
 std::string url_decode(const std::string &value);
 std::string xwww_to_json(const std::string &body);
-std::string get_header_value(const std::string& request, const std::string& header_name);
+std::string get_header_value(
+    const std::string& request, 
+    const std::string& header_name
+);
 std::string extract_boundary(const std::string& content_type);
 
 // Routing support
@@ -58,7 +66,6 @@ private:
     bool http_only;
 public:
     Cookie(const std::string &name, const std::string &value, int max_age, const std::string &path, const std::string &domain, bool secure, bool http_only);
-    bool isExpired(std::time_t now = std::time(nullptr)) const;
     std::string toString() const;
 };
 
@@ -78,8 +85,7 @@ public:
     json body(const std::vector<char> &request);
     json handle_file_upload(const std::vector<char> &request, const std::string &upload_dir, const std::string &required_field);
 
-    std::string set_cookie(std::string &response, const Cookie &cookie);
-    std::string get_cookie(const std::string &request, const std::string &name);
+    std::string get_cookie(const std::vector<char> &request, const std::string &name);
 };
 
 class server {
