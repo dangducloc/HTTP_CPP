@@ -47,7 +47,14 @@ int main() {
             }
             return response(upload_result.dump(), 200);
         });
-
+        handler.get("/cookie", [&](const vector<char> &req) -> vector<char> {
+            Cookie cookie("test", "coook", 3600, "/", "", false, true);
+            string cookieHeader = "Set-Cookie: " + cookie.toString();
+            return response("{\"msg\":\"Cookie set\"}", 200,{cookieHeader});
+        });
+        handler.get("/redirect", [](const vector<char> &req) -> vector<char> {
+            return redirect("/", 302);
+        });
 
         server srv;
         srv.run(handler);

@@ -6,11 +6,12 @@
 
 using namespace std;
 
-string redirect(const string &toPath, int code) {
+vector<char> redirect(const string &toPath, int code) {
     string status;
     if(code < 300 || code >= 400) {
-        cout << "[ERROR] Invalid redirect code (Bro WTF!!!): " << code << endl;
-        return "HTTP/1.1 400 Bro WTF!!!\r\n\r\n";
+        cout << "[ERROR] Invalid redirect code (Bro WTF!!!)" << code << endl;
+        string error_str = "HTTP/1.1 400 Bro WTF!!!\r\n\r\n";
+        return vector<char>(error_str.begin(), error_str.end());    
     }
     status = get_Status(code);
 
@@ -20,16 +21,22 @@ string redirect(const string &toPath, int code) {
     res << "Location: " << toPath << "\r\n";
     res << "Content-Type: text/plain\r\n\r\n";
     res << "Redirecting to " << toPath;
-    return res.str();
+    string res_str = res.str();
+    return vector<char>(res_str.begin(), res_str.end());
 }
 
 
-vector<char> response(const string &content, int code, const string &contentType) {
+vector<char> response(const string &content, int code, const string &contentType, const vector<string>& extra_headers) {
     stringstream res;
 
     res << "HTTP/1.1 " << get_Status(code) << "\r\n";
     res << "Server: " << getENV("SERVER_NAME") << "\r\n";
     res << "Content-Type: " << contentType << "\r\n";
+
+    for (const string& h : extra_headers) {
+        res << h << "\r\n";
+    }
+
     res << "Content-Length: " << content.size() << "\r\n";
     res << "Connection: close\r\n\r\n";
     res << content;
@@ -37,6 +44,7 @@ vector<char> response(const string &content, int code, const string &contentType
     string response_str = res.str();
     return vector<char>(response_str.begin(), response_str.end());
 }
+
 bool endsWith(const string &str, const string &suffix)
 {
     return str.size() >= suffix.size() &&
