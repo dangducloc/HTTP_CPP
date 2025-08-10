@@ -26,7 +26,7 @@ json request_handler::body(const vector<char> &req) {
             throw runtime_error("Missing boundary in Content-Type");
         }
 
-        vector<FormPart> parts = parse_multipart(body, boundary);
+        vector<FormPart> parts = parse_multipart(req, boundary);
         json j;
         for (const auto &part : parts) {
             if (part.filename.empty()) {

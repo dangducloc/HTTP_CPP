@@ -16,9 +16,7 @@ json request_handler::handle_file_upload(const vector<char> &req, const string &
     if (boundary.empty()) {
         return {{"error", "Missing or invalid boundary"}};
     }
-
-    string body = extract_body(request);
-    vector<FormPart> parts = parse_multipart(body, boundary);
+    vector<FormPart> parts = parse_multipart(req, boundary);
 
     json uploaded = json::array();
 

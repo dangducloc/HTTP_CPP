@@ -15,13 +15,14 @@ void request_handler::get(const string &path, RouteHandler handler) {
     GET_ROUTES[path] = handler;
 }
 
-string request_handler::get_Param(const string &query, const string &key) {
-    size_t start = query.find(key + "=");
+string request_handler::get_Param(const vector<char> &req, const string &key) {
+    string req_str(req.begin(), req.end());
+    size_t start = req_str.find(key + "=");
     if (start == string::npos)
         return "";
     start += key.length() + 1;
-    size_t end = query.find('&', start);
-    return query.substr(start, (end == string::npos ? query.length() : end) - start);
+    size_t end = req_str.find('&', start);
+    return req_str.substr(start, (end == string::npos ? req_str.length() : end) - start);
 }
 
 vector<char> request_handler::handleGET(const vector<char> &req) {

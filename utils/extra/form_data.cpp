@@ -44,36 +44,47 @@ string extract_boundary(const string& content_type) {
 }
 
 // Parse multipart/form-data
-vector<FormPart> parse_multipart(const string& body, const string& boundary) {
+vector<FormPart> parse_multipart(const vector<char>& body, const string& boundary) {
+    for (const auto& val : body) {
+        std::cout << val ;
+    }
     vector<FormPart> parts;
     string delimiter = "--" + boundary;
     string end_delimiter = delimiter + "--";
 
-    size_t pos = 0, next;
+    auto pos = body.begin();
+    
+    while (true) {
+        auto start = search(pos, body.end(), delimiter.begin(), delimiter.end());
+        if (start == body.end()) break;
+        start += delimiter.size();
 
-    while ((next = body.find(delimiter, pos)) != string::npos) {
-        size_t part_start = next + delimiter.length();
+        if (distance(start, body.end()) >= 2 && *(start) == '-' && *(start + 1) == '-') break;
 
-        // Skip leading \r\n
-        if (body.substr(part_start, 2) == "\r\n") {
-            part_start += 2;
+        if (distance(start, body.end()) >= 2 && *(start) == '\r' && *(start + 1) == '\n') {
+            start += 2;
         }
 
-        size_t part_end = body.find(delimiter, part_start);
-        if (part_end == string::npos) break;
+        auto next = search(start, body.end(), delimiter.begin(), delimiter.end());
+        auto part_end = (next != body.end()) ? next : body.end();
 
-        string part = body.substr(part_start, part_end - part_start);
-        pos = part_end;
+        const string double_crlf = "\r\n\r\n";
+        auto header_end = search(start, part_end, double_crlf.begin(), double_crlf.end());
+        if (header_end == part_end) {
+            pos = part_end;
+            continue;
+        }
 
-        // Separate headers and content
-        size_t header_end = part.find("\r\n\r\n");
-        if (header_end == string::npos) continue;
+        string headers(start, header_end);
+        auto content_start = header_end + double_crlf.size();
+        auto content_end = part_end;
 
-        string headers = part.substr(0, header_end);
-        string content = part.substr(header_end + 4);  // keep raw data
+        // Fix: Remove trailing \r or \n at the end of part content
+        while (content_end != content_start && (*(content_end - 1) == '\r' || *(content_end - 1) == '\n')) {
+            --content_end;
+        }
 
         FormPart fp;
-
         istringstream header_stream(headers);
         string line;
         while (getline(header_stream, line)) {
@@ -84,14 +95,16 @@ vector<FormPart> parse_multipart(const string& body, const string& boundary) {
                 if (name_pos != string::npos) {
                     size_t start = name_pos + 6;
                     size_t end = line.find("\"", start);
-                    fp.name = line.substr(start, end - start);
+                    if (end != string::npos)
+                        fp.name = line.substr(start, end - start);
                 }
 
                 size_t filename_pos = line.find("filename=\"");
                 if (filename_pos != string::npos) {
                     size_t start = filename_pos + 10;
                     size_t end = line.find("\"", start);
-                    fp.filename = line.substr(start, end - start);
+                    if (end != string::npos)
+                        fp.filename = line.substr(start, end - start);
                 }
             }
 
@@ -100,8 +113,15 @@ vector<FormPart> parse_multipart(const string& body, const string& boundary) {
             }
         }
 
-        fp.data = vector<unsigned char>(content.begin(), content.end());
+        fp.data = vector<unsigned char>(content_start, content_end);
+
+        cout << "Parsed part: name=" << fp.name
+             << ", filename=" << fp.filename
+             << ", size=" << fp.data.size() << endl;
+
         parts.push_back(fp);
+
+        pos = part_end;
     }
 
     return parts;

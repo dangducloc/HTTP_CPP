@@ -52,7 +52,7 @@ struct FormPart {
    std::vector<unsigned char> data;
 };
 
-std::vector<FormPart> parse_multipart(const std::string& body, const std::string& boundary);
+std::vector<FormPart> parse_multipart(const std::vector<char>& req, const std::string& boundary);
 
 class Cookie {
 private:
@@ -79,7 +79,7 @@ public:
     void get(const std::string &path, RouteHandler handler);
     std::vector<char> handlePOST(const std::vector<char> &raw_request);
     void post(const std::string &path, RouteHandler handler);
-    std::string get_Param(const std::string &query, const std::string &key);
+    std::string get_Param(const std::vector<char> &req, const std::string &key);
 
 
     json body(const std::vector<char> &request);
