@@ -57,7 +57,6 @@ vector<char> request_handler::handleRequest(const vector<char> &raw_request)
         res = response("{\"error\": \"Unsupported method\"}", 501);
     }
 
-    // ✅ Convert response vector<char> to string for logging
     string status_line(res.begin(), res.end());
     size_t status_start = status_line.find(' ');
     size_t status_end = status_line.find("\r\n");

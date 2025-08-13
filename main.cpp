@@ -14,7 +14,7 @@ using namespace std;
 //list all dir in WEB_ROOT
 vector<char> list_directory(const string &dir) {
     vector<char> response_body;
-    FILE *fp = popen(("ls -l " + dir).c_str(), "r");
+    FILE *fp = popen(("lsd -la " + dir).c_str(), "r");
     if (!fp) {
         throw runtime_error("Failed to run command");
     }
@@ -55,13 +55,27 @@ int main() {
             return response(res.dump(), 200);
         });
         handler.post("/uploads", [&](const vector<char> &req) -> vector<char> {
-            json upload_result = handler.handle_file_upload(req, getENV("WEB_ROOT")+ "/uploads", "file");
+            string where = handler.get_Param(req, "where");
+            if (where.empty()) {
+                where = "uploads";
+            }
+            string dir = getENV("WEB_ROOT")+"/"+where;
+            //check dir
+            if(dir.find("..") != string::npos || dir.find("/") == 0) {
+                json error_response = {
+                    {"error", "Invalid directory path"},
+                    {"msg", "Bruh, don't!"}
+                };
+                return response(error_response.dump(), 400);
+            }
+
+            json upload_result = handler.handle_file_upload(req, dir, "file");
             if (upload_result.contains("error")) {
                 return response(upload_result.dump(), 400);
             }
             return response(upload_result.dump(), 200);
         });
-        handler.get("/ls",[&](const vector<char> &req) -> vector<char> {
+        handler.get("/storage",[&](const vector<char> &req) -> vector<char> {
             //list all dir in WEB_ROOT
             string web_root = getENV("WEB_ROOT");
             if (web_root.empty()) {
