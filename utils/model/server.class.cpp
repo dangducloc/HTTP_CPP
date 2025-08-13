@@ -1,5 +1,6 @@
 #include "../utils.h"
 #include <iostream>
+#include <vector>
 #include <stdexcept>
 #include <cstring>
 #include <unistd.h>
@@ -39,15 +40,47 @@ server::server() {
     cout << "[+] Server listening on port " << PORT << endl;
 }
 
-void handle_client(socket_t client_socket, request_handler& handler) {
-    char buffer[4096];
-    ssize_t bytesReceived = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
-    if (bytesReceived > 0) {
-        buffer[bytesReceived] = '\0';
-        string request(buffer);
-        string response = handler.handleRequest(request);
-        send(client_socket, response.c_str(), response.length(), 0);
+void handle_client(socket_t client_socket, request_handler &handler) {
+    vector<char> buffer;
+    char temp[8192];
+    ssize_t bytesReceived;
+
+    string header_data;
+    while (header_data.find("\r\n\r\n") == string::npos) {
+        bytesReceived = recv(client_socket, temp, sizeof(temp), 0);
+        if (bytesReceived <= 0) break;
+        header_data.append(temp, temp + bytesReceived);
     }
+
+    size_t content_length = 0;
+    {
+        size_t pos = header_data.find("Content-Length:");
+        if (pos != string::npos) {
+            pos += 15; // bỏ qua "Content-Length:"
+            while (pos < header_data.size() && isspace(header_data[pos])) pos++;
+            size_t end = header_data.find("\r\n", pos);
+            content_length = std::stoul(header_data.substr(pos, end - pos));
+        }
+    }
+
+    buffer.insert(buffer.end(), header_data.begin(), header_data.end());
+
+    size_t header_end_pos = header_data.find("\r\n\r\n") + 4;
+    size_t body_already = header_data.size() - header_end_pos;
+    size_t body_needed = content_length > body_already ? content_length - body_already : 0;
+
+    while (body_needed > 0) {
+        bytesReceived = recv(client_socket, temp, sizeof(temp), 0);
+        if (bytesReceived <= 0) break;
+        buffer.insert(buffer.end(), temp, temp + bytesReceived);
+        body_needed -= bytesReceived;
+    }
+
+    if (!buffer.empty()) {
+        std::vector<char> response = handler.handleRequest(buffer);
+        send(client_socket, response.data(), response.size(), 0);
+    }
+
     close(client_socket);
 }
 

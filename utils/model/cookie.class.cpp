@@ -14,10 +14,6 @@ Cookie::Cookie(const string &name, const string &value, int max_age, const strin
       secure(secure),
       http_only(http_only) {}
       
-bool Cookie::isExpired(time_t now) const {
-    return (now - creat_at) > max_age;
-}
-
 string Cookie::toString() const {
     string cookie_str = name + "=" + value;
     if (!path.empty()) {
