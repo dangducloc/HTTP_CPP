@@ -8,7 +8,7 @@
 using namespace std;
 
 // Helper: Get value of specific header
-string get_header_value(const string& request, const string& header_name) {
+string request_handler::get_header_value(const string& request, const string& header_name) {
     istringstream stream(request);
     string line;
     string prefix = header_name + ": ";
@@ -28,7 +28,7 @@ string get_header_value(const string& request, const string& header_name) {
 }
 
 // Helper: Extract boundary from Content-Type header
-string extract_boundary(const string& content_type) {
+string request_handler::extract_boundary(const string& content_type) {
     string prefix = "boundary=";
     size_t pos = content_type.find(prefix);
     if (pos == string::npos) return "";
@@ -44,7 +44,7 @@ string extract_boundary(const string& content_type) {
 }
 
 // Parse multipart/form-data
-vector<FormPart> parse_multipart(const vector<char>& body, const string& boundary) {
+vector<FormPart>request_handler::parse_multipart(const vector<char>& body, const string& boundary) {
     for (const auto& val : body) {
         std::cout << val ;
     }

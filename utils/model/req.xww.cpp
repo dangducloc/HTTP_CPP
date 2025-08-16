@@ -9,13 +9,9 @@
 
 using namespace std;
 
-unordered_map<string, RouteHandler> POST_ROUTES;
 
-void request_handler::post(const string &path, RouteHandler handler) {
-    POST_ROUTES[path] = handler;
-}
 
-string xwww_to_json(const string &body) {
+string request_handler::xwww_to_json(const string &body) {
     istringstream ss(body);
     string key_value;
 
@@ -67,21 +63,4 @@ string xwww_to_json(const string &body) {
 
     json << "}";
     return json.str();
-}
-
-vector<char> request_handler::handlePOST(const vector<char> &req) {
-    string req_str(req.begin(), req.end());
-    stringstream requestStream(req_str);
-    string method, rawpath, protocol;
-    requestStream >> method >> rawpath >> protocol;
-
-    size_t qmark = rawpath.find('?');
-    string path = (qmark != string::npos) ? rawpath.substr(0, qmark) : rawpath;
-
-    auto it = POST_ROUTES.find(path);
-    if (it != POST_ROUTES.end()) {
-        return it->second(req);
-    } else {
-        return response("{\"error\": \"Route not found\"}", 404);
-    }
 }
