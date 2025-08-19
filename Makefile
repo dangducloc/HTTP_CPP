@@ -4,19 +4,8 @@ CXXFLAGS = -std=c++17 -Wall -I./utils
 
 # Sources
 SRC = main.cpp \
-      utils/extra/read_env.cpp \
-      utils/extra/read_file.cpp \
-      utils/extra/form_data.cpp \
-      utils/model/request.class.cpp \
-      utils/model/logger.class.cpp \
-      utils/model/server.class.cpp \
-      utils/model/cookie.class.cpp \
-      utils/model/req.init_get.cpp \
-      utils/model/req.init_post.cpp \
-      utils/model/req.body.cpp \
-      utils/model/req.file_upload.cpp \
-      utils/model/req.cookie.cpp \
-      utils/extra/extra.cpp
+      $(wildcard utils/extra/*.cpp) \
+      $(wildcard utils/model/*.cpp)
 
 # Output
 TARGET = server
@@ -25,8 +14,8 @@ TARGET = server
 all: $(TARGET)
 
 $(TARGET): $(SRC)
-	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET) -lstdc++fs
+	$(CXX) $(CXXFLAGS) $(SRC) -o $(TARGET)
 
-# Clean up (Windows)
+# Clean up
 clean:
-	del /Q $(TARGET)
+	-rm -f $(TARGET) server.exe

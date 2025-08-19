@@ -12,6 +12,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <string_view>
 #include "../lib/json.hpp"
 #include "./thread_pool/thread_pool.hpp"
 
@@ -33,17 +34,11 @@ std::vector<char> response(
 );
 std::string extract_body(const std::string &request);
 std::string url_decode(const std::string &value);
-std::string xwww_to_json(const std::string &body);
-std::string get_header_value(
-    const std::string& request, 
-    const std::string& header_name
-);
-std::string extract_boundary(const std::string& content_type);
+
 
 // Routing support
-using RouteHandler = std::function<std::vector<char>(const std::vector<char> &)>;
-extern std::unordered_map<std::string, RouteHandler> GET_ROUTES;
-extern std::unordered_map<std::string, RouteHandler> POST_ROUTES;
+using RouteHandler = std::function<std::vector<char>(const std::vector<char>&)>;
+extern std::unordered_map<std::string, std::unordered_map<std::string, RouteHandler>> ROUTES;
 
 struct FormPart {
    std::string name;
@@ -52,7 +47,6 @@ struct FormPart {
    std::vector<unsigned char> data;
 };
 
-std::vector<FormPart> parse_multipart(const std::vector<char>& req, const std::string& boundary);
 
 class Cookie {
 private:
@@ -74,13 +68,30 @@ public:
     std::string WEB_ROOT;
 
     request_handler();
-    std::vector<char> handleRequest(const std::vector<char> &raw_request);
-    std::vector<char> handleGET(const std::vector<char> &raw_request);
-    void get(const std::string &path, RouteHandler handler);
-    std::vector<char> handlePOST(const std::vector<char> &raw_request);
-    void post(const std::string &path, RouteHandler handler);
-    std::string get_Param(const std::vector<char> &req, const std::string &key);
 
+    std::vector<char> handleRequest(const std::vector<char> &raw_request);
+    std::vector<char> handle_route(
+        const std::string& method,
+        const std::string& path,
+        const std::vector<char>& req
+    );
+    std::vector<char> GET(const std::vector<char> &raw_request);
+    void get(const std::string &path, RouteHandler handler);
+    std::vector<char> POST_PUT_DEL(const std::vector<char> &raw_request);
+    void post(const std::string &path, RouteHandler handler);
+    void put(const std::string &path, RouteHandler handler);
+    void del(const std::string &path, RouteHandler handler);
+    
+    std::pair<std::string,std::string> split_path_query(std::string_view rawpath);
+    std::vector<char> serve_file(const std::string& path);
+    std::string get_Param(const std::vector<char> &req, const std::string &key);
+    std::string xwww_to_json(const std::string &body);
+    std::string get_header_value(
+        const std::string& request, 
+        const std::string& header_name
+    );
+    std::string extract_boundary(const std::string& content_type);
+    std::vector<FormPart> parse_multipart(const std::vector<char>& req, const std::string& boundary);
 
     json body(const std::vector<char> &request);
     json handle_file_upload(const std::vector<char> &request, const std::string &upload_dir, const std::string &required_field);

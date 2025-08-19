@@ -35,7 +35,20 @@ int main() {
             this_thread::sleep_for(chrono::seconds(3));
             return response("{\"msg\":\"say no to UI - linh\"}", 200);
         });
-
+        handler.put("/", [](const vector<char> &req) -> vector<char> {
+            json res = {
+                {"msg", "PUT request received"},
+                {"status", "success"}
+            };
+            return response(res.dump(),200);
+        });
+        handler.del("/", [](const vector<char> &req) -> vector<char> {
+            json res = {
+                {"msg", "DELETE request received"},
+                {"status", "success"}
+            };
+            return response(res.dump(),200);
+        });
         
         handler.post("/echo", [&](const vector<char> &req) -> vector<char> {
             json body = handler.body(req);
