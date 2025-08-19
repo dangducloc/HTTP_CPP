@@ -49,11 +49,10 @@ vector<char> request_handler::handleRequest(const vector<char> &raw_request)
     std::vector<char> res;
     if (method == "GET") {
         res = GET(raw_request);
-    } else if (method == "POST") {
+    } else if (method == "POST" ||method == "PUT" ||method == "DELETE") {
         res = POST_PUT_DEL(raw_request);
-    } else if (method == "PUT" || method == "DELETE") {
-        res = response("{\"error\": \"Method not allowed\"}", 405);
-    } else {
+    }
+    else {
         res = response("{\"error\": \"Unsupported method\"}", 501);
     }
 

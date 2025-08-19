@@ -25,7 +25,7 @@ vector<char> request_handler::handle_route(
         if (it_path != it_method->second.end())
             return it_path->second(req);
     }
-    return response("{\"error\": \"Route not found\"}", 404);
+    return serve_file(path);
 }
 
 vector<char> request_handler::serve_file(const string& path) {
