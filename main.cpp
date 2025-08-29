@@ -49,6 +49,13 @@ int main() {
             };
             return response(res.dump(),200);
         });
+        handler.patch("/", [](const vector<char> &req) -> vector<char> {
+            json res = {
+                {"msg", "PATCH request received"},
+                {"status", "success"}
+            };
+            return response(res.dump(),200);
+        });
         
         handler.post("/echo", [&](const vector<char> &req) -> vector<char> {
             json body = handler.body(req);

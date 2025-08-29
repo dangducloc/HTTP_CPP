@@ -47,7 +47,7 @@ vector<char> request_handler::serve_file(const string& path) {
     return vector<char>(result.begin(), result.end());
 }
 
-vector<char> request_handler::POST_PUT_DEL(const vector<char> &req) {
+vector<char> request_handler::POST_PUT_DEL_PATCH(const vector<char> &req) {
     string_view req_view(req.data(), req.size());
     size_t method_end = req_view.find(' ');
     size_t path_end = req_view.find(' ', method_end + 1);
@@ -88,4 +88,7 @@ void request_handler::del(const string &path, RouteHandler handler) {
     ROUTES["DELETE"][path] = handler;
 }
 
+void request_handler::patch(const string &path, RouteHandler handler) { 
+    ROUTES["PATCH"][path] = handler;
+}
 

@@ -77,10 +77,11 @@ public:
     );
     std::vector<char> GET(const std::vector<char> &raw_request);
     void get(const std::string &path, RouteHandler handler);
-    std::vector<char> POST_PUT_DEL(const std::vector<char> &raw_request);
+    std::vector<char> POST_PUT_DEL_PATCH(const std::vector<char> &raw_request);
     void post(const std::string &path, RouteHandler handler);
     void put(const std::string &path, RouteHandler handler);
     void del(const std::string &path, RouteHandler handler);
+    void patch(const std::string &path, RouteHandler handler); 
     
     std::pair<std::string,std::string> split_path_query(std::string_view rawpath);
     std::vector<char> serve_file(const std::string& path);

@@ -5,9 +5,10 @@ utils/test/*
 *.txt
 server
 demo.jpeg
+logs/request.log
 *.py
 demo.*
 test/*
 www/uploads/*
 www/image/*
-www/index.html
+main.cpp

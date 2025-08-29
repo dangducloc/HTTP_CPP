@@ -46,11 +46,11 @@ vector<char> request_handler::handleRequest(const vector<char> &raw_request)
         debug << " | Body Start: " << string(body.begin(), body.begin() + min((size_t)50, body.size()));
     }
 
-    std::vector<char> res;
+    vector<char> res;
     if (method == "GET") {
         res = GET(raw_request);
-    } else if (method == "POST" ||method == "PUT" ||method == "DELETE") {
-        res = POST_PUT_DEL(raw_request);
+    } else if (method == "PATCH" || method == "POST" || method == "PUT" || method == "DELETE") {
+        res = POST_PUT_DEL_PATCH(raw_request);
     }
     else {
         res = response("{\"error\": \"Unsupported method\"}", 501);
